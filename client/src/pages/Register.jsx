@@ -21,7 +21,12 @@ const Register = () => {
             await register(formData.name, formData.email, formData.password);
             navigate('/login');
         } catch (err) {
-            setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            console.error('Registration error:', err);
+            if (!err.response) {
+                setError('Cannot reach server. Ensure the backend is public or uses your LAN IP.');
+            } else {
+                setError(err.response.data?.error || 'Registration failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }

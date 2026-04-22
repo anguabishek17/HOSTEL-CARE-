@@ -20,7 +20,13 @@ const Login = () => {
         try {
             await login(email, password);
         } catch (err) {
-            setError(err.response?.data?.error || 'Invalid credentials. Please try again.');
+            console.error('Login error:', err);
+            if (!err.response) {
+                // Network error (server down or unreachable from this device)
+                setError('Cannot reach server. If you are on mobile, ensure the backend is public or uses your LAN IP.');
+            } else {
+                setError(err.response.data?.error || 'Invalid credentials. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
