@@ -1,0 +1,23 @@
+databases:
+  - name: hostel-db
+    databaseName: hostel_care
+    user: admin
+    plan: free
+
+services:
+  - type: web
+    name: hostel-care-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hostel-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
