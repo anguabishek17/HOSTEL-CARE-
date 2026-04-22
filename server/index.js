@@ -20,6 +20,7 @@ const authRoutes = require('./routes/authRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const reportRoutes = require('./routes/reportsRoutes');
 
 // Init DB
 initDb().catch(console.error);
@@ -41,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.get('/', (req, res) => res.send('Hostel Complaint Management API acts perfectly'));
 

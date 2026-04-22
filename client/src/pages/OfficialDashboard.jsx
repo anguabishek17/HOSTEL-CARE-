@@ -6,7 +6,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { getCategoryData } from '../constants/categories';
-import { TrendingUp, TrendingDown, Minus, Clock, Send, CheckCircle, AlertTriangle, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Clock, Send, CheckCircle, AlertTriangle, Activity, FileText, Download, Calendar, Loader2 } from 'lucide-react';
 import api from '../config/api';
 
 
@@ -26,6 +26,13 @@ const OfficialDashboard = () => {
     const [recent, setRecent] = useState([]);
     const [daysFilter, setDaysFilter] = useState(0);
 
+    // Reports State
+    const [reportMonth, setReportMonth] = useState(new Date().getMonth() + 1);
+    const [reportYear, setReportYear] = useState(new Date().getFullYear());
+    const [reportSummary, setReportSummary] = useState(null);
+    const [loadingSummary, setLoadingSummary] = useState(false);
+    const [downloading, setDownloading] = useState(false);
+
     useEffect(() => {
         const fetchAll = async () => {
             try {
@@ -41,6 +48,58 @@ const OfficialDashboard = () => {
         };
         fetchAll();
     }, [token, daysFilter]);
+
+    useEffect(() => {
+        const fetchReportSummary = async () => {
+            setLoadingSummary(true);
+            try {
+                // We use the overview endpoint with month/year params if we want to preview
+                // For simplicity, we can fetch a subset of metrics for that month
+                const res = await api.get(`/api/analytics/overview?month=${reportMonth}&year=${reportYear}`);
+                setReportSummary(res.data.current);
+            } catch (err) { console.error(err); }
+            finally { setLoadingSummary(false); }
+        };
+        fetchReportSummary();
+    }, [reportMonth, reportYear]);
+
+    const handleDownloadPDF = async () => {
+        setDownloading(true);
+        try {
+            const response = await api.get(`/api/reports/monthly?month=${reportMonth}&year=${reportYear}`, {
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Hostel_Report_${reportMonth}_${reportYear}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (err) { 
+            console.error(err);
+            alert('Failed to generate PDF report');
+        } finally { setDownloading(false); }
+    };
+
+    const handleDownloadCSV = async () => {
+        setDownloading(true);
+        try {
+            const response = await api.get(`/api/reports/export`, {
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Complaints_Export_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (err) { 
+            console.error(err);
+            alert('Failed to export CSV');
+        } finally { setDownloading(false); }
+    };
 
     const statusData = overview ? [
         { name: 'Dispatched', value: overview.current.dispatched },
@@ -212,6 +271,88 @@ const OfficialDashboard = () => {
                                         );
                                     })}
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Reports & Analytics Section */}
+                    <div className="mt-8">
+                        <div className="card p-6 border-l-4 border-l-violet-500">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                <div className="space-y-1">
+                                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                        <FileText className="w-5 h-5 text-violet-500" />
+                                        Reports & Archive
+                                    </h2>
+                                    <p className="text-xs text-gray-500">Generate formal documentation for records and decision making</p>
+                                </div>
+                                
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
+                                        <Calendar className="w-4 h-4 text-gray-400" />
+                                        <select 
+                                            value={reportMonth} 
+                                            onChange={(e) => setReportMonth(parseInt(e.target.value))}
+                                            className="bg-transparent text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer"
+                                        >
+                                            {Array.from({length: 12}, (_, i) => (
+                                                <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
+                                            ))}
+                                        </select>
+                                        <select 
+                                            value={reportYear} 
+                                            onChange={(e) => setReportYear(parseInt(e.target.value))}
+                                            className="bg-transparent text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer"
+                                        >
+                                            {[2024, 2025, 2026].map(y => (
+                                                <option key={y} value={y}>{y}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={handleDownloadPDF}
+                                        disabled={downloading}
+                                        className="btn-primary py-2 px-4 flex items-center gap-2 text-sm shadow-sm"
+                                    >
+                                        {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                                        Generate PDF
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={handleDownloadCSV}
+                                        disabled={downloading}
+                                        className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 py-2 px-4 rounded-xl flex items-center gap-2 text-sm transition-all shadow-sm"
+                                    >
+                                        <FileText className="w-4 h-4" />
+                                        Export All CSV
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Report Preview Stats */}
+                            <div className="mt-6 pt-6 border-t border-gray-50">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Summary for {new Date(reportYear, reportMonth-1).toLocaleString('default', { month: 'long' })} {reportYear}</p>
+                                {loadingSummary ? (
+                                    <div className="flex items-center gap-3 py-4">
+                                        <Loader2 className="w-5 h-5 animate-spin text-violet-400" />
+                                        <span className="text-sm text-gray-400">Loading metrics...</span>
+                                    </div>
+                                ) : reportSummary ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {[
+                                            { label: 'Total Volume', value: reportSummary.total, color: 'text-gray-800' },
+                                            { label: 'Completed', value: reportSummary.completed, color: 'text-green-600' },
+                                            { label: 'In Progress', value: reportSummary.in_progress, color: 'text-blue-600' },
+                                            { label: 'Resolution Rate', value: reportSummary.total ? Math.round((reportSummary.completed / reportSummary.total) * 100) + '%' : '0%', color: 'text-violet-600' },
+                                        ].map(stat => (
+                                            <div key={stat.label} className="bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+                                                <p className="text-[10px] font-semibold text-gray-500 mb-1">{stat.label}</p>
+                                                <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : null}
                             </div>
                         </div>
                     </div>

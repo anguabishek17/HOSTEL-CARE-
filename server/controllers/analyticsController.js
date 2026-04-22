@@ -3,12 +3,18 @@ const pool = require('../config/db');
 exports.getOverview = async (req, res) => {
     try {
         const days = parseInt(req.query.days) || 0; // 0 means All Time
+        const month = parseInt(req.query.month);
+        const year = parseInt(req.query.year);
         
         // Build WHERE clauses for current and previous periods
         let currentWhere = '';
         let previousWhere = '';
         
-        if (days > 0) {
+        if (month && year) {
+            currentWhere = `WHERE EXTRACT(MONTH FROM created_at) = ${month} AND EXTRACT(YEAR FROM created_at) = ${year}`;
+            // For monthly mode, we don't necessarily need a previous comparison for the report preview
+            previousWhere = `WHERE EXTRACT(MONTH FROM created_at) = ${month === 1 ? 12 : month - 1} AND EXTRACT(YEAR FROM created_at) = ${month === 1 ? year - 1 : year}`;
+        } else if (days > 0) {
             currentWhere = `WHERE created_at >= NOW() - INTERVAL '${days} days'`;
             previousWhere = `WHERE created_at >= NOW() - INTERVAL '${days * 2} days' AND created_at < NOW() - INTERVAL '${days} days'`;
         }
