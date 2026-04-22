@@ -100,42 +100,68 @@ const OfficialDashboard = () => {
 
                         {/* Left: Charts */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Bar chart */}
+                            {/* Bar chart replacement (Reliable CSS bars) */}
                             <div className="card p-4 sm:p-6">
                                 <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Issue Volume by Category</h3>
-                                <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={categories} margin={{ top: 5, right: 5, left: -20, bottom: 50 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                                            <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={0} angle={-40} textAnchor="end" />
-                                            <YAxis stroke="#94a3b8" allowDecimals={false} tick={{ fontSize: 11 }} />
-                                            <Tooltip
-                                                cursor={{ fill: 'rgba(59,130,246,0.05)' }}
-                                                contentStyle={{ backgroundColor: '#fff', borderColor: '#e2e8f0', borderRadius: '10px', fontSize: '12px' }}
-                                            />
-                                            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                                                {categories.map((_, i) => (
-                                                    <Cell key={i} fill={['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#6366f1'][i % 10]} />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                <div className="space-y-4 pt-2">
+                                    {categories.length > 0 ? categories.map((cat, i) => {
+                                        const maxVal = Math.max(...categories.map(c => c.value)) || 1;
+                                        const percent = (cat.value / maxVal) * 100;
+                                        const colors = [
+                                            'bg-blue-500', 'bg-purple-500', 'bg-emerald-500', 
+                                            'bg-amber-500', 'bg-rose-500', 'bg-cyan-500'
+                                        ];
+                                        const color = colors[i % colors.length];
+                                        return (
+                                            <div key={i} className="space-y-1.5 animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+                                                <div className="flex justify-between text-xs font-semibold text-gray-600">
+                                                    <span>{cat.name}</span>
+                                                    <span className="bg-gray-100 px-2 py-0.5 rounded text-[10px]">{cat.value} Tickets</span>
+                                                </div>
+                                                <div className="h-3 w-full bg-gray-50 rounded-full border border-gray-100/50">
+                                                    <div 
+                                                        className={`h-full ${color} rounded-full shadow-sm transition-all duration-1000 ease-out`} 
+                                                        style={{ width: `${percent}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    }) : (
+                                        <div className="text-center py-12">
+                                            <p className="text-xs text-gray-400 italic">No category data recorded yet.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Pie chart */}
+                            {/* Status Distribution replacement (Visual grid) */}
                             <div className="card p-4 sm:p-6">
-                                <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Status Distribution</h3>
-                                <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie data={statusData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={4} dataKey="value">
-                                                {statusData.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
-                                            </Pie>
-                                            <Tooltip contentStyle={{ backgroundColor: '#fff', borderColor: '#e2e8f0', borderRadius: '10px', fontSize: '12px' }} />
-                                            <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#4b5563' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Status Breakdown</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                                    {statusData.map((s, i) => {
+                                        const colors = {
+                                            'Dispatched': 'bg-gray-100 text-gray-600 border-gray-200',
+                                            'In Progress': 'bg-blue-50 text-blue-600 border-blue-200',
+                                            'Completed': 'bg-green-50 text-green-600 border-green-200'
+                                        };
+                                        const colorClass = colors[s.name] || 'bg-gray-50';
+                                        const total = overview?.current?.total || 1;
+                                        const percent = Math.round((s.value / total) * 100);
+
+                                        return (
+                                            <div key={i} className={`p-4 rounded-2xl border ${colorClass} flex flex-col items-center justify-center text-center`}>
+                                                <span className="text-2xl font-bold mb-0.5">{s.value}</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-wider mb-2 opacity-80">{s.name}</span>
+                                                <div className="w-full h-1.5 bg-white/50 rounded-full overflow-hidden">
+                                                    <div 
+                                                        className={`h-full bg-current opacity-60 rounded-full`}
+                                                        style={{ width: `${percent}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-[10px] mt-1.5 font-medium">{percent}% of total</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
