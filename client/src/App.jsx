@@ -38,7 +38,7 @@ const App = () => {
     <Router>
       <div className="flex min-h-screen bg-gradient-to-br from-blue-50/60 via-white to-indigo-50/40">
         {user && <Sidebar />}
-        <main className={`flex-1 ${user ? 'p-6 sm:p-8 ml-0 sm:ml-64' : ''}`}>
+        <main className={`flex-1 min-w-0 ${user ? 'p-4 sm:p-6 lg:p-8 sm:ml-64' : ''}`}>
           <Routes>
             <Route path="/login"    element={!user ? <Login />    : <Navigate to="/" />} />
             <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />

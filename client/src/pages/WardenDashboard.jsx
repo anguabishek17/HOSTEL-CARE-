@@ -83,7 +83,7 @@ const WardenDashboard = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 animate-fade-in pt-10 sm:pt-0 px-2">
+        <div className="page-wrapper">
             {/* Header */}
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center shadow">

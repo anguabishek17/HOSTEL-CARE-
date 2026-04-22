@@ -48,7 +48,7 @@ const OfficialDashboard = () => {
     ] : [];
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 animate-fade-in pt-10 sm:pt-0 pb-10 px-2">
+        <div className="page-wrapper">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-3">
@@ -77,17 +77,17 @@ const OfficialDashboard = () => {
             {overview && (
                 <>
                     {/* Stat cards */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         {[
                             { label: 'Total Complaints', value: overview.current.total,       trend: overview.trends?.total,       border: 'border-t-blue-500',   num: 'text-blue-700' },
                             { label: 'Dispatched',        value: overview.current.dispatched,  trend: overview.trends?.dispatched,  border: 'border-t-gray-400',   num: 'text-gray-600' },
                             { label: 'In Progress',       value: overview.current.in_progress, trend: overview.trends?.in_progress, border: 'border-t-blue-400',   num: 'text-blue-600' },
                             { label: 'Completed',         value: overview.current.completed,   trend: overview.trends?.completed,   border: 'border-t-green-500',  num: 'text-green-600' },
                         ].map(s => (
-                            <div key={s.label} className={`card p-5 border-t-4 ${s.border}`}>
-                                <p className="text-xs font-medium text-gray-500 mb-2">{s.label}</p>
-                                <div className="flex items-end justify-between">
-                                    <span className={`text-4xl font-bold ${s.num}`}>{s.value}</span>
+                            <div key={s.label} className={`card p-4 sm:p-5 border-t-4 ${s.border}`}>
+                                <p className="text-xs font-medium text-gray-500 mb-1.5 leading-tight">{s.label}</p>
+                                <div className="flex items-end justify-between gap-1">
+                                    <span className={`text-2xl sm:text-4xl font-bold ${s.num}`}>{s.value}</span>
                                     {daysFilter > 0 && <TrendIndicator trend={s.trend} />}
                                 </div>
                             </div>
@@ -100,9 +100,9 @@ const OfficialDashboard = () => {
                         {/* Left: Charts */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Bar chart */}
-                            <div className="card p-6">
-                                <h3 className="text-sm font-semibold text-gray-700 mb-5 border-b border-gray-100 pb-3">Issue Volume by Category</h3>
-                                <div className="h-72">
+                            <div className="card p-4 sm:p-6">
+                                <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Issue Volume by Category</h3>
+                                <div className="h-56 sm:h-72">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={categories} margin={{ top: 5, right: 5, left: -20, bottom: 50 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -123,9 +123,9 @@ const OfficialDashboard = () => {
                             </div>
 
                             {/* Pie chart */}
-                            <div className="card p-6">
-                                <h3 className="text-sm font-semibold text-gray-700 mb-5 border-b border-gray-100 pb-3">Status Distribution</h3>
-                                <div className="h-64">
+                            <div className="card p-4 sm:p-6">
+                                <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Status Distribution</h3>
+                                <div className="h-52 sm:h-64">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie data={statusData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={4} dataKey="value">

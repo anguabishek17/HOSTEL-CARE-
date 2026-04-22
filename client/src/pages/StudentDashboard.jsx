@@ -106,7 +106,7 @@ const StudentDashboard = () => {
     const SelectedIcon = selectedCat.icon;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pt-10 sm:pt-0 px-2">
+        <div className="page-wrapper max-w-6xl">
             {/* Header */}
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow">
