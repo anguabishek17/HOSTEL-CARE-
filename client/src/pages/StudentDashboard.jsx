@@ -81,6 +81,8 @@ const StudentDashboard = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.room_number.trim()) return alert('Room number is required');
+        
         setSubmitting(true);
         try {
             const data = new FormData();
@@ -96,7 +98,12 @@ const StudentDashboard = () => {
             setComplaints([res.data, ...complaints]);
             setFormData({ ...formData, description: '', room_number: '' });
             clearImage();
-        } catch (err) { console.error(err); }
+            alert('Complaint submitted successfully!');
+        } catch (err) { 
+            console.error(err);
+            const msg = err.response?.data?.error || 'Failed to submit complaint. Please try again.';
+            alert(msg);
+        }
         finally { setSubmitting(false); }
     };
 
