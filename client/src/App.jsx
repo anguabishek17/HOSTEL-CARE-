@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
-import Register from './pages/Register';
+// Register page is disabled as per user request (warden handles student creation)
 import Sidebar from './components/Sidebar';
 import StudentDashboard from './pages/StudentDashboard';
 import WardenDashboard from './pages/WardenDashboard';
@@ -41,7 +41,6 @@ const App = () => {
         <main className={`flex-1 min-w-0 ${user ? 'p-4 sm:p-6 lg:p-8 sm:ml-64' : ''}`}>
           <Routes>
             <Route path="/login"    element={!user ? <Login />    : <Navigate to="/" />} />
-            <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
             <Route path="/"         element={getDashboard()} />
             {/* Warden-only: Student Management */}
             <Route
