@@ -217,6 +217,9 @@ const OfficialDashboard = () => {
                     </div>
                 </>
             )}
+            <div className="mt-8 pt-8 border-t border-gray-100 text-center">
+                <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">UI Engine: Stable CSS v2.1</span>
+            </div>
         </div>
     );
 };
