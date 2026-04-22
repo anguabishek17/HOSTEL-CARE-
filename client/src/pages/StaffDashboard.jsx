@@ -4,6 +4,10 @@ import { AuthContext } from '../context/AuthContext';
 import { io } from 'socket.io-client';
 import { getCategoryData } from '../constants/categories';
 import { Send, Clock, CheckCircle, Users } from 'lucide-react';
+import api from '../config/api';
+
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
 const StatusBadge = ({ status }) => {
     switch (status) {
@@ -20,16 +24,14 @@ const StaffDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/complaints', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get('/api/complaints');
             setComplaints(res.data);
         } catch (err) { console.error(err); }
     };
 
     useEffect(() => {
         fetchData();
-        const socket = io('http://localhost:5000');
+        const socket = io(SOCKET_URL);
         socket.on('staff_assigned', fetchData);
         socket.on('complaint_updated', fetchData);
         return () => socket.close();
@@ -37,11 +39,7 @@ const StaffDashboard = () => {
 
     const updateStatus = async (id, status) => {
         try {
-            await axios.put(
-                `http://localhost:5000/api/complaints/${id}/status`,
-                { status },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await api.put(`/api/complaints/${id}/status`, { status });
             fetchData();
         } catch (err) { console.error(err); }
     };

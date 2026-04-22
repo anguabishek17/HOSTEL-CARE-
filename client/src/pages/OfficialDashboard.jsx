@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import {
@@ -7,6 +6,8 @@ import {
 } from 'recharts';
 import { getCategoryData } from '../constants/categories';
 import { TrendingUp, TrendingDown, Minus, Clock, Send, CheckCircle, AlertTriangle, Activity } from 'lucide-react';
+import api from '../config/api';
+
 
 const COLORS = ['#6b7280', '#3b82f6', '#22c55e'];
 
@@ -27,11 +28,10 @@ const OfficialDashboard = () => {
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const conf = { headers: { Authorization: `Bearer ${token}` } };
                 const [resO, resC, resR] = await Promise.all([
-                    axios.get(`http://localhost:5000/api/analytics/overview?days=${daysFilter}`, conf),
-                    axios.get(`http://localhost:5000/api/analytics/categories?days=${daysFilter}`, conf),
-                    axios.get(`http://localhost:5000/api/analytics/recent?limit=15`, conf),
+                    api.get(`/api/analytics/overview?days=${daysFilter}`),
+                    api.get(`/api/analytics/categories?days=${daysFilter}`),
+                    api.get(`/api/analytics/recent?limit=15`),
                 ]);
                 setOverview(resO.data);
                 setCategories(resC.data);

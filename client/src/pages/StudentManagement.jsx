@@ -5,8 +5,10 @@ import {
     Users, UserPlus, Upload, Trash2, CheckCircle, AlertCircle,
     X, FileText, Download, Search, Mail, Home
 } from 'lucide-react';
+import api from '../config/api';
 
-const API = 'http://localhost:5000/api/students';
+const API_PATH = '/api/students';
+
 
 const StudentManagement = () => {
     const { token } = useContext(AuthContext);
@@ -29,12 +31,12 @@ const StudentManagement = () => {
     // Delete confirm
     const [deleteId, setDeleteId] = useState(null);
 
-    const headers = { Authorization: `Bearer ${token}` };
+    const headers = { Authorization: `Bearer ${token}` }; // kept for legacy, interceptor handles this
 
     const fetchStudents = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(API, { headers });
+            const res = await api.get(API_PATH);
             setStudents(res.data);
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
@@ -47,7 +49,7 @@ const StudentManagement = () => {
         e.preventDefault();
         setFormError(''); setFormSuccess(''); setSubmitting(true);
         try {
-            const res = await axios.post(API, form, { headers });
+            const res = await api.post(API_PATH, form);
             setFormSuccess(`Student added! Default password: ${res.data.defaultPassword}`);
             setForm({ name: '', email: '', room_number: '' });
             fetchStudents();
@@ -63,8 +65,8 @@ const StudentManagement = () => {
         try {
             const data = new FormData();
             data.append('csv', csvFile);
-            const res = await axios.post(`${API}/upload`, data, {
-                headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+            const res = await api.post(`${API_PATH}/upload`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             setCsvResult(res.data);
             fetchStudents();
@@ -76,7 +78,7 @@ const StudentManagement = () => {
     // Delete student
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`${API}/${id}`, { headers });
+            await api.delete(`${API_PATH}/${id}`);
             setStudents(prev => prev.filter(s => s.id !== id));
             setDeleteId(null);
         } catch (err) { console.error(err); }
@@ -97,7 +99,7 @@ const StudentManagement = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 animate-fade-in pt-10 sm:pt-0 px-2 pb-10">
+        <div className="page-wrapper">
             {/* Header */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-3">

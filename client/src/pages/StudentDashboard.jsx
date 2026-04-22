@@ -4,6 +4,10 @@ import { AuthContext } from '../context/AuthContext';
 import { io } from 'socket.io-client';
 import { CATEGORIES, getCategoryData } from '../constants/categories';
 import { ChevronDown, Send, Clock, CheckCircle, PlusCircle, ImagePlus, X, Home } from 'lucide-react';
+import api from '../config/api';
+
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
 const StatusBadge = ({ status }) => {
     switch (status) {
@@ -38,7 +42,7 @@ const StudentDashboard = () => {
     const fileInputRef = useRef(null);
 
     useEffect(() => {
-        const socket = io('http://localhost:5000');
+        const socket = io(SOCKET_URL);
         socket.on('complaint_updated', (upd) =>
             setComplaints(prev => prev.map(c => c.id === upd.id ? upd : c))
         );
@@ -55,9 +59,7 @@ const StudentDashboard = () => {
 
     const fetchComplaints = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/complaints', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get('/api/complaints');
             setComplaints(res.data);
         } catch (err) { console.error(err); }
     };
@@ -81,7 +83,6 @@ const StudentDashboard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            // Use FormData so multer can parse the file
             const data = new FormData();
             data.append('category', formData.category);
             data.append('description', formData.description);
@@ -89,11 +90,8 @@ const StudentDashboard = () => {
             data.append('room_number', formData.room_number);
             if (imageFile) data.append('image', imageFile);
 
-            const res = await axios.post('http://localhost:5000/api/complaints', data, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
-                }
+            const res = await api.post('/api/complaints', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
             setComplaints([res.data, ...complaints]);
             setFormData({ ...formData, description: '', room_number: '' });
@@ -275,7 +273,7 @@ const StudentDashboard = () => {
                                         {c.image_url && (
                                             <div className="mb-3 rounded-xl overflow-hidden border border-gray-100">
                                                 <img
-                                                    src={`http://localhost:5000${c.image_url}`}
+                                                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${c.image_url}`}
                                                     alt="Complaint attachment"
                                                     className="w-full max-h-48 object-cover"
                                                 />

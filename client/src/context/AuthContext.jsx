@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 
 export const AuthContext = createContext();
 
@@ -15,11 +15,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            const res = await axios.get('http://localhost:5000/api/auth/me', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const res = await api.get('/api/auth/me');
             setUser(res.data);
         } catch (error) {
             console.error(error);
@@ -36,15 +32,14 @@ export const AuthProvider = ({ children }) => {
     }, [token]);
 
     const login = async (email, password) => {
-        const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+        const res = await api.post('/api/auth/login', { email, password });
         localStorage.setItem('token', res.data.token);
         setToken(res.data.token);
         setUser(res.data.user);
     };
 
     const register = async (name, email, password) => {
-        await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
-        // Automatically login after successful registration or redirect to login.
+        await api.post('/api/auth/register', { name, email, password });
     };
 
     const logout = () => {

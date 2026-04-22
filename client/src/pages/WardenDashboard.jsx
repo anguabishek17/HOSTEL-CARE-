@@ -4,6 +4,10 @@ import { AuthContext } from '../context/AuthContext';
 import { io } from 'socket.io-client';
 import { getCategoryData } from '../constants/categories';
 import { Send, Clock, CheckCircle, Filter, KeyRound } from 'lucide-react';
+import api from '../config/api';
+
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
 const StatusBadge = ({ status }) => {
     switch (status) {
@@ -33,8 +37,8 @@ const WardenDashboard = () => {
     const fetchData = async () => {
         try {
             const [resC, resS] = await Promise.all([
-                axios.get('http://localhost:5000/api/complaints', { headers: { Authorization: `Bearer ${token}` } }),
-                axios.get('http://localhost:5000/api/complaints/staff', { headers: { Authorization: `Bearer ${token}` } }),
+                api.get('/api/complaints'),
+                api.get('/api/complaints/staff'),
             ]);
             setComplaints(resC.data);
             setStaffList(resS.data);
@@ -43,7 +47,7 @@ const WardenDashboard = () => {
 
     useEffect(() => {
         fetchData();
-        const socket = io('http://localhost:5000');
+        const socket = io(SOCKET_URL);
         socket.on('new_complaint', fetchData);
         socket.on('complaint_updated', fetchData);
         return () => socket.close();
@@ -52,21 +56,14 @@ const WardenDashboard = () => {
     const assignStaff = async (id, staffId) => {
         if (!staffId) return;
         try {
-            await axios.put(`http://localhost:5000/api/complaints/${id}/assign`,
-                { staff_id: staffId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await api.put(`/api/complaints/${id}/assign`, { staff_id: staffId });
             fetchData();
         } catch (err) { console.error(err); }
     };
 
     const updateStatus = async (id, status) => {
         try {
-            const res = await axios.put(
-                `http://localhost:5000/api/complaints/${id}/status`,
-                { status },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const res = await api.put(`/api/complaints/${id}/status`, { status });
             if (res.status === 200) fetchData();
         } catch (err) { console.error('Failed to update status', err); }
     };
@@ -182,7 +179,7 @@ const WardenDashboard = () => {
                                     {c.image_url && (
                                         <div className="rounded-xl overflow-hidden border border-gray-100">
                                             <img
-                                                src={`http://localhost:5000${c.image_url}`}
+                                                src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${c.image_url}`}
                                                 alt="Attachment"
                                                 className="w-full max-h-36 object-cover"
                                             />
