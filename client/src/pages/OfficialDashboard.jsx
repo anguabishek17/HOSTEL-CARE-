@@ -103,7 +103,7 @@ const OfficialDashboard = () => {
                             {/* Bar chart */}
                             <div className="card p-4 sm:p-6">
                                 <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Issue Volume by Category</h3>
-                                <div className="h-56 sm:h-72">
+                                <div className="h-[300px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={categories} margin={{ top: 5, right: 5, left: -20, bottom: 50 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -126,7 +126,7 @@ const OfficialDashboard = () => {
                             {/* Pie chart */}
                             <div className="card p-4 sm:p-6">
                                 <h3 className="text-sm font-semibold text-gray-700 mb-4 border-b border-gray-100 pb-3">Status Distribution</h3>
-                                <div className="h-52 sm:h-64">
+                                <div className="h-[300px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie data={statusData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={4} dataKey="value">
